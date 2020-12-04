@@ -1,0 +1,15 @@
+{
+  "name": "google-maps",
+  "homepage": "https://github.com/Carrooi/Node-GoogleMaps",
+  "version": "4.3.3",
+  "_release": "4.3.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "4.3.3",
+    "commit": "3e586070d9fd8e62128d0faef75d17d91bde6c27"
+  },
+  "_source": "https://github.com/Carrooi/Node-GoogleMaps.git",
+  "_target": "^4.3.3",
+  "_originalSource": "google-maps",
+  "_direct": true
+}

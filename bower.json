@@ -1,0 +1,24 @@
+{
+  "name": "soccer-team-app",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "google-map": "GoogleWebComponents/google-map#^2.0.5",
+    "google-maps": "^4.3.3",
+    "polymer": "Polymer/polymer#^3.4.1",
+    "shadycss": "webcomponents/shadycss#^v1.1.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^v1.1.0"
+  },
+  "resolutions": {
+    "polymer": "1.9 - 2"
+  }
+}
