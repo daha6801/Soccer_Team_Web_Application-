@@ -4,15 +4,20 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const mongoose = require('mongoose');
+const session = require('express-session');
+const flash = require('connect-flash');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var squadRouter = require('./routes/squad');
 var stadiumRouter = require('./routes/stadium');
 var stadium2Router = require('./routes/stadium2');
 var user = require('./models/users');
-
-
-var app = express();
+//var login = require('auth/login');
+//var signup = require('auth/signup');
 
 /*
 // Test code to insert documents to the mongodatabase
@@ -53,19 +58,54 @@ client.connect(err => {
 });*/
 
 // Connecting to the database using mongooose
-const mongoose = require('mongoose')
 const url = 'mongodb+srv://user:P@ssw0rd@cluster0.4gkkd.mongodb.net/mytestDatabase?retryWrites=true&w=majority'
 
-mongoose.connect(url, { useNewUrlParser: true })
+mongoose.connect(url, { 
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+  
+});
 
-const db = mongoose.connection
+const db = mongoose.connection;
 db.once('open', _ => {
   console.log('Database connected:', url)
-})
+});
 
 db.on('error', err => {
   console.error('connection error:', err)
-})
+});
+
+const sessionConfig = {
+  secret: 'Nullaquisloremutlibro',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
+}
+
+var app = express();
+
+app.use(session(sessionConfig));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(user.authenticate()));
+
+passport.serializeUser(user.serializeUser());
+passport.deserializeUser(user.deserializeUser());
+
+app.use((req, res, next) => {
+    console.log(req.session);
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -84,6 +124,8 @@ app.use('/users', usersRouter);
 app.use('/stadium', stadiumRouter);
 app.use('/stadium2', stadium2Router);
 app.use('/models', user);
+/*app.use('auth/login', login);
+app.use('auth/signup', signup);*/
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -99,25 +141,6 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-});
-
-app.use((req, res, next) => {
-    if (!req.session.user) {
-        return next();
-    }    
-    user.findById(req.session.user._id)
-        .then(user => {            
-            if (!user) {
-                return next();
-            }
-            // set the user key in the request object to the model user we get from mongoose
-            req.user = user;
-            console.log(`Current Session User Email is: ${user.email}`);
-            next();
-        })
-        .catch(err => {
-            next(new Error(err));
-        });
 });
 
 module.exports = app;
